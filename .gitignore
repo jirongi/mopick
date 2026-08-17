@@ -1,0 +1,10 @@
+build/
+.gradle/
+logs/
+.env.local
+.DS_Store
+*.iml
+.idea/
+src/main/resources/data/portfolio-images/
+*.yml
+*.yaml

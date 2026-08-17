@@ -1,0 +1,247 @@
+[
+  {
+    "portfolioId": "pf_0001",
+    "stylistId": "st_001",
+    "stylistName": "이서연",
+    "region": "서울 마포",
+    "confirmedTags": [
+      {
+        "field": "STYLE_FAMILY",
+        "value": "레이어드"
+      },
+      {
+        "field": "LENGTH",
+        "value": "쇄골"
+      },
+      {
+        "field": "BANGS",
+        "value": "시스루뱅"
+      },
+      {
+        "field": "SIDE_SILHOUETTE",
+        "value": "자연스러움"
+      },
+      {
+        "field": "BACK_SILHOUETTE",
+        "value": "A라인"
+      },
+      {
+        "field": "TOP_VOLUME",
+        "value": "보통"
+      },
+      {
+        "field": "PART",
+        "value": "중앙"
+      },
+      {
+        "field": "TEXTURE",
+        "value": "C컬"
+      }
+    ],
+    "stylistMetadata": {
+      "serviceSummary": "레이어드 커트 + 끝단 C컬 셋팅",
+      "stylingCondition": "드라이 후 32mm 봉으로 안말음, 스타일링 제품 소량",
+      "note": "모발 두께 보통, 자연 모류 기준"
+    },
+    "rightsCleared": true,
+    "published": true,
+    "imagePath": "data/portfolio-images/pf_0001.jpg",
+    "dataVersion": "2026-08-14"
+  },
+  {
+    "portfolioId": "pf_0002",
+    "stylistId": "st_001",
+    "stylistName": "이서연",
+    "region": "서울 마포",
+    "confirmedTags": [
+      {
+        "field": "STYLE_FAMILY",
+        "value": "레이어드"
+      },
+      {
+        "field": "LENGTH",
+        "value": "쇄골"
+      },
+      {
+        "field": "BANGS",
+        "value": "커튼뱅"
+      },
+      {
+        "field": "SIDE_SILHOUETTE",
+        "value": "자연스러움"
+      },
+      {
+        "field": "BACK_SILHOUETTE",
+        "value": "A라인"
+      },
+      {
+        "field": "TOP_VOLUME",
+        "value": "높음"
+      },
+      {
+        "field": "PART",
+        "value": "중앙"
+      },
+      {
+        "field": "TEXTURE",
+        "value": "S컬"
+      }
+    ],
+    "stylistMetadata": {
+      "serviceSummary": "레이어드 커트 + 뿌리 볼륨 + S컬 웨이브",
+      "stylingCondition": "뿌리 볼륨 드라이 필요, 유지 기간 약 2개월",
+      "note": null
+    },
+    "rightsCleared": true,
+    "published": true,
+    "imagePath": "data/portfolio-images/pf_0002.jpg",
+    "dataVersion": "2026-08-14"
+  },
+  {
+    "portfolioId": "pf_0003",
+    "stylistId": "st_002",
+    "stylistName": "박준호",
+    "region": "서울 성동",
+    "confirmedTags": [
+      {
+        "field": "STYLE_FAMILY",
+        "value": "보브"
+      },
+      {
+        "field": "LENGTH",
+        "value": "턱선"
+      },
+      {
+        "field": "BANGS",
+        "value": "없음"
+      },
+      {
+        "field": "SIDE_SILHOUETTE",
+        "value": "붙는형"
+      },
+      {
+        "field": "BACK_SILHOUETTE",
+        "value": "일자"
+      },
+      {
+        "field": "TOP_VOLUME",
+        "value": "낮음"
+      },
+      {
+        "field": "PART",
+        "value": "사이드"
+      },
+      {
+        "field": "TEXTURE",
+        "value": "직모"
+      }
+    ],
+    "stylistMetadata": {
+      "serviceSummary": "단발 원랭스 라인 정리",
+      "stylingCondition": "매직기 없이 드라이만으로 라인 유지",
+      "note": null
+    },
+    "rightsCleared": true,
+    "published": true,
+    "imagePath": "data/portfolio-images/pf_0003.jpg",
+    "dataVersion": "2026-08-14"
+  },
+  {
+    "portfolioId": "pf_0004",
+    "stylistId": "st_003",
+    "stylistName": "최지우",
+    "region": "서울 마포",
+    "confirmedTags": [
+      {
+        "field": "STYLE_FAMILY",
+        "value": "레이어드"
+      },
+      {
+        "field": "LENGTH",
+        "value": "가슴"
+      },
+      {
+        "field": "BANGS",
+        "value": "시스루뱅"
+      },
+      {
+        "field": "SIDE_SILHOUETTE",
+        "value": "부푼형"
+      },
+      {
+        "field": "BACK_SILHOUETTE",
+        "value": "U라인"
+      },
+      {
+        "field": "TOP_VOLUME",
+        "value": "보통"
+      },
+      {
+        "field": "PART",
+        "value": "중앙"
+      },
+      {
+        "field": "TEXTURE",
+        "value": null
+      }
+    ],
+    "stylistMetadata": {
+      "serviceSummary": "긴 기장 레이어드 커트",
+      "stylingCondition": "자연 건조 기준",
+      "note": "질감은 촬영 각도상 기록하지 않음"
+    },
+    "rightsCleared": true,
+    "published": true,
+    "imagePath": null,
+    "dataVersion": "2026-08-14"
+  },
+  {
+    "portfolioId": "pf_0005",
+    "stylistId": "st_004",
+    "stylistName": "정민아",
+    "region": "서울 마포",
+    "confirmedTags": [
+      {
+        "field": "STYLE_FAMILY",
+        "value": "레이어드"
+      },
+      {
+        "field": "LENGTH",
+        "value": "쇄골"
+      },
+      {
+        "field": "BANGS",
+        "value": "시스루뱅"
+      },
+      {
+        "field": "SIDE_SILHOUETTE",
+        "value": "자연스러움"
+      },
+      {
+        "field": "BACK_SILHOUETTE",
+        "value": "A라인"
+      },
+      {
+        "field": "TOP_VOLUME",
+        "value": "보통"
+      },
+      {
+        "field": "PART",
+        "value": "중앙"
+      },
+      {
+        "field": "TEXTURE",
+        "value": "C컬"
+      }
+    ],
+    "stylistMetadata": {
+      "serviceSummary": "레이어드 커트",
+      "stylingCondition": "드라이 후 안말음",
+      "note": "게시 동의 미확보 상태 - 매칭 후보에서 제외되어야 한다"
+    },
+    "rightsCleared": false,
+    "published": true,
+    "imagePath": "data/portfolio-images/pf_0005.jpg",
+    "dataVersion": "2026-08-14"
+  }
+]
