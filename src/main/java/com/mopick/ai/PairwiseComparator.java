@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeTypeUtils;
@@ -24,14 +23,11 @@ public class PairwiseComparator {
 
     private static final Logger log = LoggerFactory.getLogger(PairwiseComparator.class);
 
-    private final ChatClient chatClient;
-    private final AiAvailability availability;
+    private final AiChatClients clients;
     private final AiCallExecutor executor;
 
-    public PairwiseComparator(ChatClient.Builder builder, AiAvailability availability,
-                              AiCallExecutor executor) {
-        this.chatClient = builder.build();
-        this.availability = availability;
+    public PairwiseComparator(AiChatClients clients, AiCallExecutor executor) {
+        this.clients = clients;
         this.executor = executor;
     }
 
@@ -45,12 +41,12 @@ public class PairwiseComparator {
             byte[] goalJpeg, byte[] portfolioJpeg, ConfirmedSpec goal, ConfirmedSpec portfolio,
             Map<StyleField, String> requiredStates) {
 
-        if (!availability.isEnabled() || goalJpeg == null || portfolioJpeg == null) {
+        if (!clients.isEnabled() || goalJpeg == null || portfolioJpeg == null) {
             return Map.of();
         }
         String instruction = Prompts.pairwise(confirmedContext(goal, portfolio, requiredStates));
-        Optional<PairwiseAiResponse> raw = executor.call("1:1 비교", () ->
-                chatClient.prompt()
+        Optional<PairwiseAiResponse> raw = executor.callChain("1:1 비교", clients.chain(),
+                provider -> provider.client().prompt()
                         .user(u -> u.text(instruction)
                                 .media(MimeTypeUtils.IMAGE_JPEG, new ByteArrayResource(goalJpeg))
                                 .media(MimeTypeUtils.IMAGE_JPEG, new ByteArrayResource(portfolioJpeg)))

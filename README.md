@@ -3,7 +3,7 @@
 희망 사진과 검수된 작업 사례를 같은 기준으로 구조화하고, 선택 근거를 설명하는 백엔드.
 헤어스타일을 생성하거나 미용사를 평가하지 않는다.
 
-Spring Boot 4.1 / Java 17 / Spring AI 2.0 / Gemini
+Spring Boot 4.1 / Java 17 / Spring AI 2.0 / Gemini · OpenAI (환경변수로 전환)
 
 ## 설계 원칙
 
@@ -29,24 +29,53 @@ Spring Boot 4.1 / Java 17 / Spring AI 2.0 / Gemini
 ```
 
 키 없이도 기동되며 세 API 모두 `confirmed_evidence` fallback으로 응답한다.
-실제 사진 분석과 1:1 비교를 켜려면 AI Studio 키를 넣는다.
+
+제공자는 **폴백 체인**으로 묶여 있다. 앞에서부터 시도하고, 실패하면 다음으로 넘어간다.
+키가 없는 제공자는 체인에서 자동으로 빠지므로 키 하나만 넣으면 단독 운영이 된다.
 
 ```bash
-export GEMINI_API_KEY=...
-./gradlew bootRun
+GEMINI_API_KEY=... OPENAI_API_KEY=... ./gradlew bootRun   # Gemini 우선, 실패 시 OpenAI
+GEMINI_API_KEY=... ./gradlew bootRun                      # Gemini 단독
+./gradlew bootRun                                         # AI 없이 fallback만
 ```
 
-모델 기본값은 `gemini-3.5-flash`이며 `MOPICK_AI_MODEL`로 교체한다.
-계정에서 쓸 수 있는 모델은 아래로 확인한다. 임베딩은 되는데 채팅만 404가 나는 모델이 있으므로
-채팅 모델은 실제 호출로 확인하는 편이 확실하다.
+순서는 `MOPICK_AI_PROVIDERS`로 바꾼다(기본 `google-genai,openai`).
 
-```bash
-curl -H "x-goog-api-key: $GEMINI_API_KEY" https://generativelanguage.googleapis.com/v1beta/models
+평소에는 앞 제공자만 쓰인다. 뒤 제공자는 앞이 한도에 걸리거나 차단됐을 때만 호출되며,
+정확도가 낮더라도 빈 결과보다는 낫다는 판단이다. 어느 제공자가 응답했는지는 로그에 남는다.
+
+```
+StyleSpec 분석[google-genai] 실패 (1회 시도): ... 403 Your project has been denied access
+StyleSpec 분석 - 'google-genai' 실패, 'openai'로 넘어간다
+StyleSpec 분석 - 앞선 제공자 실패로 'openai'가 응답했다
 ```
 
-제공자를 바꿀 때 손대는 곳은 세 군데뿐이다. `build.gradle`의 starter, `application.yml`의
-`spring.ai.*` 블록, `AiAvailability`가 읽는 프로퍼티 이름. 나머지 AI 코드는 Spring AI
-`ChatClient`만 쓰므로 제공자에 묶여 있지 않다.
+**두 모델을 합쳐 쓰는 방식(합의 앙상블)은 넣지 않았다.** 실측에서 오히려 나빴기 때문이다.
+두 모델이 갈린 18개 필드 중 정답 판정이 가능한 10건에서 Gemini가 전부 옳았고 OpenAI가 이긴
+사례는 없었다. 합의를 요구하면 값 채움이 87%→43%로 떨어지면서 정밀도도 85%→80%로 같이 내려간다.
+앙상블은 두 모델의 실력이 비슷할 때만 이득이다.
+
+### 모델 비교 (남성 사진 4장, 같은 프롬프트로 실측)
+
+| 모델 | 정답지 일치 | 반복 호출 안정성 | temperature 0 |
+|---|---|---|---|
+| **gemini-3.5-flash** | **86%** | **93~100%** | 가능 |
+| gpt-4.1 | 43% | 100% | 가능 |
+| gpt-4o | 43% | 84% | 가능 |
+| gpt-5 | 78% | 68% | **불가**(1 고정) |
+
+Gemini를 기본으로 두는 이유는 정확도와 안정성이 함께 가장 높기 때문이다.
+같은 사진에서 같은 태그가 나와야 확정 태그와 매칭이 흔들리지 않는다.
+
+OpenAI 점수가 낮은 것은 vision 성능 자체보다 **판정 기준 문장이 Gemini에 맞춰 세 라운드에 걸쳐
+다듬어진 탓이 크다.** 특히 "이마가 안 보이면 앞머리를 NOT_VISIBLE로 두라"는 규칙을 OpenAI는
+옆모습 사진에까지 과하게 적용한다. OpenAI를 주력으로 쓰려면 `Vocabulary`의 criteria를
+그 모델 기준으로 다시 조정해야 한다.
+
+gpt-5는 정확도가 높지만 `temperature` 0을 받지 못해 같은 사진에도 값이 흔들린다.
+확정 태그가 근거인 서비스에는 맞지 않는다.
+
+모델과 온도는 `MOPICK_GEMINI_MODEL` / `MOPICK_OPENAI_MODEL` / `MOPICK_AI_TEMPERATURE`로 바꾼다.
 
 ## API
 
@@ -111,6 +140,67 @@ curl -X POST localhost:8080/api/evidence-match -H 'Content-Type: application/jso
 사용자 표현은 다음으로 고정한다.
 
 > 원하는 스타일과 관련된 작업을 해본 근거가 있는 미용사
+
+## 기하 측정 (`geometry/`)
+
+8필드 중 **좌표로 잴 수 있는 필드**는 LLM 눈대중 대신 픽셀 측정으로 정한다.
+
+```
+① 측정  사진 → HeadMeasurement (귀·턱·두상·머리카락 좌표)   ← HeadSegmenter 구현체
+② 판정  측정값 → 필드값                                    ← GeometricFieldDeriver
+③ 병합  기하 + LLM → 최종 StyleSpec                        ← GeometryMerger
+```
+
+| 필드 | 판정 |
+|---|---|
+| `LENGTH` | **기하** — 머리카락 최하단이 귀 하단보다 얼마나 아래인지 |
+| 나머지 7개 | LLM 관찰 |
+
+**기하로 다루는 건 `LENGTH` 하나다.** 나머지 후보 둘은 실측 결과 근거가 부족해 뺐다.
+
+- `TOP_VOLUME` — 두상 최상단이 언제나 머리카락에 덮여 있어 "두상 위 머리 두께"를 잴 수 없다.
+  귀 상단 기준 대체 지표를 실측했더니 정답과 순서가 **반대로** 나왔다.
+- `SIDE_SILHOUETTE` — 옆·뒷모습에서는 보이는 얼굴 폭이 작아져 비율이 부풀려진다.
+  가장 붙은 머리(투블럭 뒷모습)가 가장 큰 값으로 나왔다.
+- `STYLE_FAMILY`·`BANGS`·`TEXTURE` — 의미·질감 판단이라 애초에 기하로 환원되지 않는다.
+
+**단위는 귀 상단~턱**이다. 정수리~턱을 쓰고 싶지만 두상 최상단은 관측할 수 없다.
+
+임계값은 실측으로 정했다. 짧은 커트도 뒷목 잔머리가 늘 귀 아래로 조금은 내려오기 때문에
+0으로 두면 전부 "귀덮음"이 된다. 사진 4장의 `(머리끝 − 귀하단) ÷ 단위`:
+
+```
+투블럭 -0.28   짧은펌 -0.03   귀 드러난 커트 0.17   목덜미까지 오는 커트 0.33
+                              └────────── 임계값 0.25 ──────────┘
+```
+
+병합 규칙은 하나다 — **잰 필드는 측정이 이기고, 못 잰 필드는 LLM 관찰이 남는다.**
+
+### 측정기 켜기
+
+`models/face-parsing.onnx`를 두면 `OnnxHeadSegmenter`가 JVM 안에서 모델을 돌린다.
+파일이 없으면 아무것도 재지 않고 전부 LLM 관찰로 채워지며, 기동은 정상적으로 된다.
+
+```bash
+MOPICK_FACE_PARSING_MODEL=/path/to/model.onnx ./gradlew bootRun
+```
+
+모델 요구 사항과 라이선스 주의는 `models/README.md` 참고. 출력이 CelebAMask-HQ 19분류
+체계여야 하며, 다른 체계를 쓰려면 `FaceParsingMask`의 상수만 바꾸면 된다.
+
+### 왜 필요했나 — 그리고 결과
+
+`LENGTH`는 판정 기준 문장을 세 라운드에 걸쳐 고쳤는데도 두 사진(귀가 드러나는 짧은 커트 /
+뒷머리가 목까지 오는 커트)을 끝내 구분하지 못했다. 기준을 바꿀 때마다 두 사진이 **함께**
+움직였다 — 규칙은 일관되게 적용되는데 모델이 두 사진의 차이 자체를 지각하지 못한 것이다.
+
+측정으로 바꾼 뒤 실제 사진 4장 결과(`EndToEndLengthTest`):
+
+```
+1.jpeg 귀위   2.jpeg 귀위   3.jpeg 귀덮음   4.jpeg 귀위
+```
+
+3회 반복해도 값이 동일하다. LLM 방식의 흔들림이 사라졌다.
 
 ## 호출 절약 장치
 

@@ -1,5 +1,9 @@
 package com.mopick.ai;
 
+import com.mopick.geometry.GeometryMerger;
+import com.mopick.geometry.HeadMeasurement;
+import com.mopick.geometry.HeadSegmenter;
+import com.mopick.geometry.GeometricFieldDeriver;
 import com.mopick.stylespec.AnalysisStatus;
 import com.mopick.stylespec.Confidence;
 import com.mopick.stylespec.ObservationState;
@@ -15,7 +19,6 @@ import java.util.Map;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeTypeUtils;
@@ -29,17 +32,22 @@ public class StyleSpecAnalyzer {
 
     private static final Logger log = LoggerFactory.getLogger(StyleSpecAnalyzer.class);
 
-    private final ChatClient chatClient;
-    private final AiAvailability availability;
+    private final AiChatClients clients;
     private final AiCallExecutor executor;
     private final StyleSpecCache cache;
+    private final HeadSegmenter segmenter;
+    private final GeometricFieldDeriver deriver;
+    private final GeometryMerger merger;
 
-    public StyleSpecAnalyzer(ChatClient.Builder builder, AiAvailability availability,
-                             AiCallExecutor executor, StyleSpecCache cache) {
-        this.chatClient = builder.build();
-        this.availability = availability;
+    public StyleSpecAnalyzer(AiChatClients clients, AiCallExecutor executor, StyleSpecCache cache,
+                             HeadSegmenter segmenter, GeometricFieldDeriver deriver,
+                             GeometryMerger merger) {
+        this.clients = clients;
         this.executor = executor;
         this.cache = cache;
+        this.segmenter = segmenter;
+        this.deriver = deriver;
+        this.merger = merger;
     }
 
     public StyleSpec analyzeGoal(byte[] jpeg) {
@@ -51,7 +59,7 @@ public class StyleSpecAnalyzer {
     }
 
     private StyleSpec analyze(byte[] jpeg, String instruction) {
-        if (!availability.isEnabled()) {
+        if (!clients.isEnabled()) {
             // 키가 없으면 관찰 자체가 불가능하다. 빈 스펙을 주고 사용자가 직접 태그를 고르게 한다.
             log.info("API 키 미설정 - 분석 없이 빈 StyleSpec 반환");
             return StyleSpec.unavailable(AnalysisStatus.AI_DISABLED);
@@ -61,8 +69,8 @@ public class StyleSpecAnalyzer {
             return cached.get();
         }
 
-        Optional<StyleSpecAiResponse> raw = executor.call("StyleSpec 분석", () ->
-                chatClient.prompt()
+        Optional<StyleSpecAiResponse> raw = executor.callChain("StyleSpec 분석", clients.chain(),
+                provider -> provider.client().prompt()
                         .user(u -> u.text(instruction)
                                 .media(MimeTypeUtils.IMAGE_JPEG, new ByteArrayResource(jpeg)))
                         .call()
@@ -71,8 +79,29 @@ public class StyleSpecAnalyzer {
         // 실패를 관찰 결과처럼 보이게 두면 안 된다. 상태로 구분해서 내려보낸다.
         StyleSpec spec = raw.map(this::toStyleSpec)
                 .orElseGet(() -> StyleSpec.unavailable(AnalysisStatus.AI_FAILED));
+
+        // 잴 수 있는 필드는 재서 덮어쓴다. LLM은 경계에서 흔들리지만 측정은 같은 값을 준다.
+        spec = applyGeometry(jpeg, spec);
+
         cache.put(jpeg, instruction, spec);
         return spec;
+    }
+
+    /** 측정기가 없거나 못 잰 사진이면 LLM 결과가 그대로 남는다. */
+    private StyleSpec applyGeometry(byte[] jpeg, StyleSpec llmSpec) {
+        if (!segmenter.isReady()) {
+            return llmSpec;
+        }
+        Optional<HeadMeasurement> measurement = segmenter.measure(jpeg);
+        if (measurement.isEmpty()) {
+            log.debug("기하 측정 실패 - LLM 관찰만 사용한다");
+            return llmSpec;
+        }
+        GeometryMerger.MergeResult merged = merger.merge(llmSpec, deriver.derive(measurement.get()));
+        if (!merged.measuredFields().isEmpty()) {
+            log.debug("기하로 확정한 필드: {}", merged.measuredFields());
+        }
+        return merged.spec();
     }
 
     /**

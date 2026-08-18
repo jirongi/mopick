@@ -2,6 +2,8 @@ package com.mopick.ai;
 
 import java.util.Locale;
 import java.util.Optional;
+import java.util.List;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -88,6 +90,32 @@ public class AiCallExecutor {
                 || text.contains("overloaded")
                 || text.contains("timeout")
                 || text.contains("timed out");
+    }
+
+    /**
+     * 제공자 체인을 순서대로 시도한다. 앞의 제공자가 재시도 후에도 실패하면 다음으로 넘어간다.
+     *
+     * <p>평소에는 첫 제공자에서 끝난다. 뒤 제공자는 앞이 한도에 걸리거나 죽었을 때만 쓰인다.
+     * 정확도가 낮은 제공자라도 빈 결과보다는 낫다는 판단이다.
+     *
+     * @return 어느 제공자든 성공하면 그 결과, 전부 실패하면 빈 값
+     */
+    public <T> Optional<T> callChain(String label, List<AiChatClients.Provider> chain,
+                                     Function<AiChatClients.Provider, T> action) {
+        for (int i = 0; i < chain.size(); i++) {
+            AiChatClients.Provider provider = chain.get(i);
+            Optional<T> result = call(label + "[" + provider.name() + "]", () -> action.apply(provider));
+            if (result.isPresent()) {
+                if (i > 0) {
+                    log.info("{} - 앞선 제공자 실패로 '{}'가 응답했다", label, provider.name());
+                }
+                return result;
+            }
+            if (i + 1 < chain.size()) {
+                log.warn("{} - '{}' 실패, '{}'로 넘어간다", label, provider.name(), chain.get(i + 1).name());
+            }
+        }
+        return Optional.empty();
     }
 
     /** 응답이 알려준 대기 시간(초)을 밀리초로. 없으면 빈 값. */

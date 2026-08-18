@@ -8,3 +8,4 @@ logs/
 src/main/resources/data/portfolio-images/
 *.yml
 *.yaml
+models/*.onnx
