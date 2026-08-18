@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  * 확정 태그만으로 8개 claim 뼈대를 만든다. AI를 전혀 쓰지 않는다.
  *
  * <p>이 결과가 곧 {@code confirmed_evidence} fallback이다. 사진이 없거나 API key가 없거나
- * AI 호출이 실패해도 사용자는 항상 이 뼈대를 받는다. AI는 이 위에 설명만 얹는다.
+ * AI 호출이 실패해도 사용자는 항상 이 뼈대를 받는다. AI는 이 위에 설명만 얹는다..
  */
 @Component
 public class ClaimSkeletonBuilder {
