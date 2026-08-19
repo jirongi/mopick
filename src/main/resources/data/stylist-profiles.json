@@ -1,0 +1,23 @@
+[
+  {
+    "stylistId": "st_001",
+    "salonName": "모픽 헤어 마포",
+    "title": "수석 디자이너",
+    "introduction": "레이어드·C컬 스타일링에 강점이 있는 디자이너입니다. 상담 시 모발 상태를 먼저 확인합니다.",
+    "naverPlaceId": "place_st_001"
+  },
+  {
+    "stylistId": "st_002",
+    "salonName": "모픽 헤어 성동",
+    "title": "디자이너",
+    "introduction": "단발·보브 라인 정리와 자연스러운 드라이 스타일을 선보입니다.",
+    "naverPlaceId": "place_st_002"
+  },
+  {
+    "stylistId": "st_003",
+    "salonName": "모픽 헤어 마포",
+    "title": "디자이너",
+    "introduction": "긴 기장 레이어드와 볼륨 펌 스타일을 다룹니다.",
+    "naverPlaceId": "place_st_003"
+  }
+]

@@ -1,0 +1,119 @@
+[
+  {
+    "id": "vintage_cut",
+    "name": "빈티지컷",
+    "aliases": ["빈티지", "빈티지컷", "빈티지 컷"],
+    "category": "CUT",
+    "styleFamily": "레이어드",
+    "description": "레트로한 무드의 레이어드 컷. 끝선을 가볍게 살려 자연스러운 볼륨을 만듭니다.",
+    "features": ["가벼운 층", "자연스러운 볼륨", "중단발~긴 길이 추천"],
+    "popularRank": 5,
+    "defaultTags": [
+      {"field": "STYLE_FAMILY", "value": "레이어드"},
+      {"field": "LENGTH", "value": "쇄골"},
+      {"field": "TEXTURE", "value": "C컬"}
+    ]
+  },
+  {
+    "id": "layered_cut",
+    "name": "레이어드컷",
+    "aliases": ["레이어드", "레이어드컷", "중단발 레이어드컷"],
+    "category": "CUT",
+    "styleFamily": "레이어드",
+    "description": "층을 만들어 가볍고 자연스럽게 흐르는 컷입니다.",
+    "features": ["가벼운 중단발", "자연스러운 흐름", "볼륨감"],
+    "popularRank": 1,
+    "defaultTags": [
+      {"field": "STYLE_FAMILY", "value": "레이어드"},
+      {"field": "LENGTH", "value": "어깨"},
+      {"field": "BANGS", "value": "시스루뱅"}
+    ]
+  },
+  {
+    "id": "hush_cut",
+    "name": "허쉬컷",
+    "aliases": ["허쉬", "허쉬컷", "시스루뱅 허쉬컷"],
+    "category": "CUT",
+    "styleFamily": "샤기",
+    "description": "가벼운 층과 끝선 텍스처가 특징인 컷입니다.",
+    "features": ["가벼운 층", "끝선 텍스처", "중~긴 길이"],
+    "popularRank": 6,
+    "defaultTags": [
+      {"field": "STYLE_FAMILY", "value": "샤기"},
+      {"field": "LENGTH", "value": "가슴"},
+      {"field": "BANGS", "value": "시스루뱅"}
+    ]
+  },
+  {
+    "id": "as_perm",
+    "name": "애즈펌",
+    "aliases": ["애즈", "애즈펌"],
+    "category": "PERM",
+    "styleFamily": "레이어드",
+    "description": "굵은 웨이브로 자연스러운 볼륨을 살리는 펌입니다.",
+    "features": ["굵은 웨이브", "자연스러운 볼륨", "중간~긴 길이 추천"],
+    "popularRank": 2,
+    "defaultTags": [
+      {"field": "STYLE_FAMILY", "value": "레이어드"},
+      {"field": "TEXTURE", "value": "S컬"},
+      {"field": "TOP_VOLUME", "value": "높음"}
+    ]
+  },
+  {
+    "id": "down_perm",
+    "name": "다운펌",
+    "aliases": ["다운", "다운펌"],
+    "category": "PERM",
+    "styleFamily": "레이어드",
+    "description": "부피를 줄이고 붙는 실루엣을 만드는 펌입니다.",
+    "features": ["볼륨 다운", "붙는 실루엣", "관리 편함"],
+    "popularRank": 4,
+    "defaultTags": [
+      {"field": "SIDE_SILHOUETTE", "value": "붙는형"},
+      {"field": "TOP_VOLUME", "value": "낮음"}
+    ]
+  },
+  {
+    "id": "tassel_cut",
+    "name": "태슬컷",
+    "aliases": ["태슬", "태슬컷"],
+    "category": "CUT",
+    "styleFamily": "레이어드",
+    "description": "끝선이 일자에 가깝고 층이 선명한 컷입니다.",
+    "features": ["선명한 층", "일자 끝선", "중단발"],
+    "popularRank": 3,
+    "defaultTags": [
+      {"field": "STYLE_FAMILY", "value": "레이어드"},
+      {"field": "LENGTH", "value": "턱선"},
+      {"field": "BACK_SILHOUETTE", "value": "일자"}
+    ]
+  },
+  {
+    "id": "feather_perm",
+    "name": "퓨링펌",
+    "aliases": ["퓨링", "퓨링펌"],
+    "category": "PERM",
+    "styleFamily": "레이어드",
+    "description": "끝선을 가볍게 펼쳐 자연스러운 움직임을 주는 펌입니다.",
+    "features": ["가벼운 끝선", "자연스러운 움직임"],
+    "popularRank": 7,
+    "defaultTags": [
+      {"field": "TEXTURE", "value": "강한웨이브"},
+      {"field": "LENGTH", "value": "어깨"}
+    ]
+  },
+  {
+    "id": "vintage_perm",
+    "name": "빈티지펌",
+    "aliases": ["빈티지펌"],
+    "category": "PERM",
+    "styleFamily": "레이어드",
+    "description": "복고풍 웨이브와 볼륨이 특징인 펌입니다.",
+    "features": ["복고풍 웨이브", "볼륨", "중~긴 길이"],
+    "popularRank": 8,
+    "defaultTags": [
+      {"field": "TEXTURE", "value": "S컬"},
+      {"field": "TOP_VOLUME", "value": "높음"}
+    ]
+  }
+]
